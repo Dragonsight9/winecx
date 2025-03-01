@@ -3,10 +3,10 @@ name: Build Wine on macOS
 on:
   push:
     branches:
-      - master
+      - crossover-wine
   pull_request:
     branches:
-      - master
+      - crossover-wine
 
 jobs:
   build:
