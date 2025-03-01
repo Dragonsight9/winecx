@@ -1,0 +1,73 @@
+name: Build Wine on macOS
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    
+    - name: Install Homebrew
+      run: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    - name: Install dependencies
+      run: |
+        
+        brew install --formula bison mingw-w64 pkgconfig
+        brew install --formula freetype gnutls molten-vk sdl2
+        brew install mingw-w64
+        brew install bison
+        brew install llvm
+        brew install lld
+        # Add any other dependencies you need here
+
+    - name: Unlink and Relink Bison
+      run: |
+        brew unlink bison
+        brew link bison --force
+    
+    - name: Update PATH for Bison
+      run: |
+        echo 'export PATH="/usr/local/opt/bison/bin:$PATH"' >> $HOME/.zshrc
+        source $HOME/.zshrc
+        bison --version  # Verify Bison version
+
+    - name: Build Wine
+      run: |
+        ./configure
+        make
+    
+    - name: Tar the compiled Wine
+      run: |
+        tar -czvf wine.tar.gz wine
+    
+    - name: Create release draft
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v1.0.0
+        release_name: Wine Build
+        draft: true
+        prerelease: false
+    
+    - name: Upload tar file to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./wine.tar.gz
+        asset_name: wine.tar.gz
+        asset_content_type: application/gzip
