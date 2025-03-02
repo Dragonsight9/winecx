@@ -2,6 +2,14 @@ name: macports
 
 on:
   workflow_dispatch:
+  push:
+  branches:
+      - master
+      - crossover-wine
+  pull_request:
+    branches:
+      - master
+      - crossover-wine
 
 env:
   CC: ccache clang -arch x86_64
