@@ -12,10 +12,11 @@ on:
       - crossover-wine
 
 env:
-  CC: ccache clang -arch x86_64
-  CXX: ccache clang++ -arch x86_64
+  CC: ccache clang -arch aarch64
+  CXX: ccache clang++ -arch aarch64
   i386_CC: ccache i686-w64-mingw32-gcc
   x86_64_CC: ccache x86_64-w64-mingw32-gcc
+  aarch64_CC: ccache aarch_64-w64-mingw32-gcc
   CPATH: /opt/local/include
   LIBRARY_PATH: /opt/local/lib
   CFLAGS: -g -O2
@@ -91,10 +92,10 @@ jobs:
           mkdir -p ${{ env.BUILDROOT }}/wine64
           pushd ${{ env.BUILDROOT }}/wine64
           ${{ env.WINE_CONFIGURE }} \
-            --build=x86_64-apple-darwin \
+            --build=aarch64-apple-darwin \
             --prefix= \
             --disable-tests \
-            --enable-archs=i386,x86_64 \
+            --enable-archs=i386,x86_64, aarch64 \
             --without-alsa \
             --without-capi \
             --with-coreaudio \
